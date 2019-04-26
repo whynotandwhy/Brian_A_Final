@@ -26,6 +26,8 @@ public:
     int NumBlocks;
 
     void CheckNumBlocks();
+    void DelayedColoring();
+    void DelayColoring();
 };
 
 

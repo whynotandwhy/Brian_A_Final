@@ -18,22 +18,12 @@ ABrian_A_FinalGameMode::ABrian_A_FinalGameMode()
 	HUDClass = ABrian_A_FinalHUD::StaticClass();
 }
 
-
 void ABrian_A_FinalGameMode::HandleMatchHasStarted()
 {
     Super::HandleMatchHasStarted();
 
-    TArray<AActor*> BlocksToSet;
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADestroyLinkActor::StaticClass(), BlocksToSet);
+    DelayColoring();
 
-    for (AActor* psudoBlock : BlocksToSet)
-    {
-        ADestroyLinkActor* actualBlock = Cast<ADestroyLinkActor>(psudoBlock);
-        if (!actualBlock)
-            continue;
-        actualBlock->SetColor(FMath::RandRange(1, 3));
-        NumBlocks++;
-    }
     if (MyScoring)
     {
         auto newWidget = CreateWidget<UUserWidget>(GetWorld(), MyScoring);
@@ -53,4 +43,24 @@ void ABrian_A_FinalGameMode::CheckNumBlocks()
     ActiveWidgets.Add(newWidget);
 }
 
+void ABrian_A_FinalGameMode::DelayedColoring()
+{
+    TArray<AActor*> BlocksToSet;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADestroyLinkActor::StaticClass(), BlocksToSet);
+
+    for (AActor* psudoBlock : BlocksToSet)
+    {
+        ADestroyLinkActor* actualBlock = Cast<ADestroyLinkActor>(psudoBlock);
+        if (!actualBlock)
+            continue;
+        actualBlock->SetColor(FMath::RandRange(1, 3));
+        NumBlocks++;
+    }
+}
+
+void ABrian_A_FinalGameMode::DelayColoring()
+{
+    FTimerHandle PostBeginPlayDelay;
+    GetWorldTimerManager().SetTimer(PostBeginPlayDelay, this, &ABrian_A_FinalGameMode::DelayedColoring, 1.0f, false);
+}
 

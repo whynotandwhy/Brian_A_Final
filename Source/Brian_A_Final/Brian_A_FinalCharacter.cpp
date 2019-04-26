@@ -10,6 +10,7 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
+#include "UnrealNetwork.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
@@ -44,7 +45,7 @@ ABrian_A_FinalCharacter::ABrian_A_FinalCharacter()
 
 	// Create a gun mesh component
 	FP_Gun = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FP_Gun"));
-	FP_Gun->SetOnlyOwnerSee(true);			// only the owning player will see this mesh
+	FP_Gun->SetOnlyOwnerSee(false);			// only the owning player will see this mesh
 	FP_Gun->bCastDynamicShadow = false;
 	FP_Gun->CastShadow = false;
 	// FP_Gun->SetupAttachment(Mesh1P, TEXT("GripPoint"));
@@ -119,7 +120,7 @@ void ABrian_A_FinalCharacter::SetupPlayerInputComponent(class UInputComponent* P
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	// Bind fire event
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ABrian_A_FinalCharacter::OnFire);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ABrian_A_FinalCharacter::ServerOnFire);
 
 	// Enable touchscreen input
 	EnableTouchscreenMovement(PlayerInputComponent);
@@ -173,7 +174,7 @@ void ABrian_A_FinalCharacter::OnFire()
 	// try and play the sound if specified
 	if (FireSound != NULL)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+        NetMulticastPlaySound();
 	}
 
 	// try and play a firing animation if specified
@@ -299,4 +300,21 @@ bool ABrian_A_FinalCharacter::EnableTouchscreenMovement(class UInputComponent* P
 	}
 	
 	return false;
+}
+
+
+bool ABrian_A_FinalCharacter::ServerOnFire_Validate() { return true; }
+void ABrian_A_FinalCharacter::ServerOnFire_Implementation(){
+    OnFire();
+}
+bool ABrian_A_FinalCharacter::NetMulticastPlaySound_Validate() { return true; }
+void ABrian_A_FinalCharacter::NetMulticastPlaySound_Implementation() {
+    UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+}
+
+void ABrian_A_FinalCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(ABrian_A_FinalCharacter, FireSound);
+    DOREPLIFETIME(ABrian_A_FinalCharacter, FireAnimation);
 }

@@ -69,11 +69,11 @@ public:
 	TSubclassOf<class ABrian_A_FinalProjectile> ProjectileClass;
 
 	/** Sound to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay, Replicated)
 	class USoundBase* FireSound;
 
 	/** AnimMontage to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, Replicated)
 	class UAnimMontage* FireAnimation;
 
 	/** Whether to use motion controller location for aiming. */
@@ -81,6 +81,11 @@ public:
 	uint32 bUsingMotionControllers : 1;
 
     
+    UFUNCTION(Reliable, Server, WithValidation)
+        virtual void ServerOnFire();
+
+    UFUNCTION(Reliable, NetMulticast, WithValidation)
+        virtual void NetMulticastPlaySound();
 
 protected:
 	
