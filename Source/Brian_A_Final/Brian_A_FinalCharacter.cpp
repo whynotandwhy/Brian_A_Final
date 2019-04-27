@@ -312,6 +312,12 @@ void ABrian_A_FinalCharacter::NetMulticastPlaySound_Implementation() {
     UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 }
 
+bool ABrian_A_FinalCharacter::ClientLoadHud_Validate(TSubclassOf<UUserWidget> newWidget) { return true; }
+void ABrian_A_FinalCharacter::ClientLoadHud_Implementation(TSubclassOf<UUserWidget> newWidget) {
+    auto newWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), newWidget);
+    newWidgetInstance->AddToViewport();
+}
+
 void ABrian_A_FinalCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 

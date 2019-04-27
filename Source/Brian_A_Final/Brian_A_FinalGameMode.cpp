@@ -7,6 +7,7 @@
 #include "Public/DestroyLinkActor.h"
 #include "UObject/ConstructorHelpers.h"
 
+
 ABrian_A_FinalGameMode::ABrian_A_FinalGameMode()
 	: Super()
 {
@@ -24,12 +25,7 @@ void ABrian_A_FinalGameMode::HandleMatchHasStarted()
 
     DelayColoring();
 
-    if (MyScoring)
-    {
-        auto newWidget = CreateWidget<UUserWidget>(GetWorld(), MyScoring);
-        newWidget->AddToViewport();
-        ActiveWidgets.Add(newWidget);
-    }
+
 }
 
 void ABrian_A_FinalGameMode::CheckNumBlocks()
@@ -38,9 +34,9 @@ void ABrian_A_FinalGameMode::CheckNumBlocks()
     if ((NumBlocks > 0) || (!FinalScore))
         return;
 
-    auto newWidget = CreateWidget<UUserWidget>(GetWorld(), FinalScore);
-    newWidget->AddToViewport();
-    ActiveWidgets.Add(newWidget);
+    for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+        if (Iterator->IsValid())
+            AddView(Iterator->Get(), FinalScore);
 }
 
 void ABrian_A_FinalGameMode::DelayedColoring()
@@ -56,11 +52,26 @@ void ABrian_A_FinalGameMode::DelayedColoring()
         actualBlock->SetColor(FMath::RandRange(1, 3));
         NumBlocks++;
     }
+
+    if (!MyScoring)
+        return;
+
+    for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+        if (Iterator->IsValid())
+            AddView(Iterator->Get(), MyScoring);
 }
 
 void ABrian_A_FinalGameMode::DelayColoring()
 {
     FTimerHandle PostBeginPlayDelay;
     GetWorldTimerManager().SetTimer(PostBeginPlayDelay, this, &ABrian_A_FinalGameMode::DelayedColoring, 1.0f, false);
+}
+
+void ABrian_A_FinalGameMode::AddView(APlayerController* playercontroler, TSubclassOf<UUserWidget> newWidget)
+{
+    ABrian_A_FinalCharacter* mycharater = Cast<ABrian_A_FinalCharacter>(playercontroler->GetCharacter());
+
+    if ((mycharater) && (newWidget))
+        mycharater->ClientLoadHud(newWidget);
 }
 

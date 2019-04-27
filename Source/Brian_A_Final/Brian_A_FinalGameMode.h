@@ -28,6 +28,8 @@ public:
     void CheckNumBlocks();
     void DelayedColoring();
     void DelayColoring();
+
+    void AddView(APlayerController* playercontroler, TSubclassOf<UUserWidget> newWidget);
 };
 
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Blueprint/UserWidget.h"
 #include "Brian_A_FinalCharacter.generated.h"
 
 class UInputComponent;
@@ -86,6 +87,9 @@ public:
 
     UFUNCTION(Reliable, NetMulticast, WithValidation)
         virtual void NetMulticastPlaySound();
+
+    UFUNCTION(Reliable, Client, WithValidation)
+        virtual void ClientLoadHud(TSubclassOf<UUserWidget> newWidget);
 
 protected:
 	
