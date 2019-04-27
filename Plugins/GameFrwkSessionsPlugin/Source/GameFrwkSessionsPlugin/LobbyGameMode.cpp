@@ -50,7 +50,7 @@ void ALobbyGameMode::StartGame()
 	
     /*We are hosting the game and load the map in listen mode*/
     //CALL ServerTravel() on the World and pass in "/Game/Levels/Sandbox/TestMap?listen"
-    World->ServerTravel("/Game/Levels/BlockBuster.BlockBuster");
+    World->ServerTravel("/Game/Levels/BlockBuster?listen");
 
     //World->ServerTravel("/Game/Levels/Sandbox/LV_Sandbox?listen");
     //World->SeamlessTravel("/Game/Levels/Sandbox/TestMap?listen", true);
